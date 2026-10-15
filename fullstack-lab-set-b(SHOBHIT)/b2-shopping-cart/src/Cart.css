@@ -1,0 +1,93 @@
+/* Paper Counter - black, white and grays only. Character comes from type and shape. */
+:root {
+  --ink: #000;
+  --mid: #666;
+  --soft: #d6d6d6;
+  --wash: #efefef;
+  --paper: #fff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--wash);
+  color: var(--ink);
+  font: 16px/1.5 "Trebuchet MS", "Gill Sans", Verdana, sans-serif;
+}
+
+.counter { max-width: 940px; margin: 0 auto; padding: 44px 20px 80px; }
+
+.masthead h1 {
+  margin: 0;
+  font: italic 400 2.6rem/1.05 Georgia, "Times New Roman", serif;
+  letter-spacing: -0.02em;
+}
+.masthead p { margin: 8px 0 34px; color: var(--mid); max-width: 46ch; }
+
+.desk { display: grid; grid-template-columns: 1fr 340px; gap: 40px; align-items: start; }
+
+h2 { margin: 0 0 14px; font: 700 1.05rem/1.2 Georgia, serif; }
+
+/* ---- shelf ---- */
+.shelf ul { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink); }
+.shelf li {
+  display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 16px;
+  padding: 13px 2px; border-bottom: 1px solid var(--soft);
+}
+.item-price { font-variant-numeric: tabular-nums; color: var(--mid); }
+
+button { font: inherit; cursor: pointer; }
+button:focus-visible { outline: 3px solid var(--mid); outline-offset: 2px; }
+
+.add {
+  padding: 5px 16px; background: var(--ink); color: #fff;
+  border: 1.5px solid var(--ink); border-radius: 999px; font-weight: 700;
+}
+.add:hover { background: var(--paper); color: var(--ink); }
+.add:active { transform: translateY(1px); }
+
+/* ---- the receipt slip ---- */
+.slip {
+  background: var(--paper);
+  padding: 22px 20px 30px;
+  border: 1.5px solid var(--ink);
+  font-family: "Courier New", Courier, monospace;
+  /* zig-zag torn edge along the bottom */
+  --tooth: 10px;
+  -webkit-mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(var(--tooth) * 2) 100%;
+          mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / calc(var(--tooth) * 2) 100%;
+  position: sticky; top: 20px;
+}
+.slip h2 { text-align: center; padding-bottom: 12px; border-bottom: 2px dashed var(--ink); font-family: Georgia, serif; }
+
+.empty { text-align: center; color: var(--mid); margin: 26px 0; }
+
+.lines { list-style: none; margin: 0; padding: 0; }
+.lines li { padding: 12px 0; border-bottom: 1px dashed var(--soft); }
+.line-top { display: flex; justify-content: space-between; gap: 10px; font-weight: 700; }
+.line-sum { font-variant-numeric: tabular-nums; }
+.line-bottom { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: .9rem; }
+.unit { color: var(--mid); }
+
+.stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--ink); }
+.stepper button { width: 28px; height: 28px; background: var(--paper); border: 0; font-weight: 700; }
+.stepper button:hover { background: var(--ink); color: #fff; }
+.qty { min-width: 30px; text-align: center; font-weight: 700; border-inline: 1.5px solid var(--ink); line-height: 28px; }
+
+.drop { background: none; border: 0; padding: 2px 0; color: var(--mid); text-decoration: underline; }
+.drop:hover { color: var(--ink); }
+
+.sums { margin-top: 16px; padding-top: 12px; border-top: 2px dashed var(--ink); }
+.sums p { margin: 3px 0; }
+.sums .saving { color: var(--mid); }
+.sums .grand { margin-top: 8px; padding-top: 8px; border-top: 1.5px solid var(--ink); font-size: 1.2rem; font-weight: 700; }
+
+@media (max-width: 760px) {
+  .desk { grid-template-columns: 1fr; }
+  .slip { position: static; }
+  .masthead h1 { font-size: 2rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .add, .stepper button { transition: background .12s, color .12s; }
+}

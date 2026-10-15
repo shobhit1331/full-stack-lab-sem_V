@@ -1,0 +1,20 @@
+{
+  "name": "b1-jwt-auth-api",
+  "version": "1.0.0",
+  "description": "Register, log in, and reach a protected route with a JWT. Express.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0",
+    "vitest": "^2.1.8"
+  }
+}

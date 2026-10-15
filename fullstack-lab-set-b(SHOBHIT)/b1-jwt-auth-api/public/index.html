@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Front desk - JWT auth</title>
+<style>
+  :root { --ink:#000; --mid:#6b6b6b; --wash:#f1f1f1; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--wash); color:var(--ink);
+         font:16px/1.55 Georgia, "Times New Roman", serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 20px 80px; }
+  h1 { font-size: 2.3rem; margin: 0 0 6px; letter-spacing: -.02em; font-weight: 400; font-style: italic; }
+  .lede { color: var(--mid); margin: 0 0 36px; max-width: 52ch; }
+
+  /* three visitor passes, a bit like a building's front desk */
+  .pass { background:#fff; border:1.5px solid var(--ink); padding: 18px 20px 20px; margin-bottom: 22px; position: relative; }
+  .pass::before { content:""; position:absolute; top:-1.5px; left:50%; width:54px; height:9px;
+                  transform: translateX(-50%); background: var(--wash); border:1.5px solid var(--ink); border-top:0;
+                  border-radius: 0 0 8px 8px; }
+  .pass h2 { margin: 6px 0 12px; font-size: 1.15rem; font-weight: 700; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; }
+  input { flex: 1 1 180px; padding: 9px 10px; font: inherit; border:1.5px solid var(--ink); background:#fff; }
+  button { padding: 9px 18px; font: inherit; font-weight:700; border:1.5px solid var(--ink);
+           background: var(--ink); color:#fff; cursor:pointer; }
+  button:hover { background:#fff; color:var(--ink); }
+  button.quiet { background:#fff; color:var(--ink); }
+  button.quiet:hover { background: var(--wash); }
+  :focus-visible { outline: 3px solid var(--mid); outline-offset: 2px; }
+
+  .reply { margin: 14px 0 0; padding: 10px 12px; background: var(--wash); border-left: 4px solid var(--mid);
+           font: 13.5px/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; word-break: break-all; min-height: 2.6em; }
+  .reply.ok { border-left-color: var(--ink); }
+  .hint { font-size: .9rem; color: var(--mid); margin: 8px 0 0; }
+  @media (max-width:520px){ h1{font-size:1.8rem} }
+</style>
+</head>
+<body>
+<main>
+  <h1>Front desk</h1>
+  <p class="lede">A tiny page for poking the three routes by hand: sign up, sign in, then show your pass at the profile door.</p>
+
+  <section class="pass">
+    <h2>1. Sign up &mdash; POST /register</h2>
+    <form id="reg" class="row">
+      <input name="username" placeholder="username" autocomplete="username" required>
+      <input name="password" type="password" placeholder="password (6+ characters)" autocomplete="new-password" required>
+      <button>Sign up</button>
+    </form>
+    <p class="reply" id="regOut">Nothing sent yet.</p>
+  </section>
+
+  <section class="pass">
+    <h2>2. Sign in &mdash; POST /login</h2>
+    <form id="log" class="row">
+      <input name="username" placeholder="username" autocomplete="username" required>
+      <input name="password" type="password" placeholder="password" autocomplete="current-password" required>
+      <button>Sign in</button>
+    </form>
+    <p class="reply" id="logOut">Nothing sent yet.</p>
+    <p class="hint">The token stays in this page's memory for the next step, nowhere else.</p>
+  </section>
+
+  <section class="pass">
+    <h2>3. Profile &mdash; GET /profile</h2>
+    <div class="row">
+      <button id="prof">Show my profile</button>
+      <button id="bad" class="quiet">Try with a broken token</button>
+    </div>
+    <p class="reply" id="profOut">Nothing sent yet.</p>
+  </section>
+</main>
+
+<script>
+  let token = '';
+
+  async function call(path, opts, out) {
+    out.className = 'reply';
+    try {
+      const res = await fetch(path, opts);
+      const body = await res.json();
+      out.textContent = res.status + '\n' + JSON.stringify(body, null, 2);
+      if (res.ok) out.classList.add('ok');
+      return body;
+    } catch (e) {
+      out.textContent = 'Could not reach the server. Is it running?';
+    }
+  }
+
+  const send = (form) => ({
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.fromEntries(new FormData(form)))
+  });
+
+  document.getElementById('reg').addEventListener('submit', (e) => {
+    e.preventDefault();
+    call('/register', send(e.target), document.getElementById('regOut'));
+  });
+
+  document.getElementById('log').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = await call('/login', send(e.target), document.getElementById('logOut'));
+    if (body && body.token) token = body.token;
+  });
+
+  const showProfile = (t) => call('/profile', { headers: { Authorization: 'Bearer ' + t } }, document.getElementById('profOut'));
+  document.getElementById('prof').addEventListener('click', () => showProfile(token));
+  document.getElementById('bad').addEventListener('click', () => showProfile('abc.def.ghi'));
+</script>
+</body>
+</html>
